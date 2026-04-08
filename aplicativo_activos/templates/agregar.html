@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agregar Activo TIC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="navbar navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">
+                <i class="fas fa-plus-circle"></i> Agregar Nuevo Activo
+            </span>
+            <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="card">
+            <div class="card-header bg-success text-white">
+                <h4>Formulario de Registro de Activo TIC</h4>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Tipo de dispositivo *</label>
+                            <select name="tipo_dispositivo" class="form-control" required>
+                                <option value="">Seleccione...</option>
+                                <option>PC</option>
+                                <option>Impresora</option>
+                                <option>Teléfono</option>
+                                <option>Monitor</option>
+                                <option>AP</option>
+                                <option>Televisor</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Dispositivos</label>
+                            <input type="text" name="dispositivos" class="form-control" placeholder="Nombre específico">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Marca</label>
+                            <input type="text" name="marca" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Modelo</label>
+                            <input type="text" name="modelo" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Número de serie</label>
+                            <input type="text" name="numero_serie" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Procesador</label>
+                            <input type="text" name="procesador" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Generación</label>
+                            <input type="text" name="generacion" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Velocidad (GHz)</label>
+                            <input type="text" name="velocidad_ghz" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Memoria RAM (GB)</label>
+                            <input type="text" name="memoria_ram_gb" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Tipo de almacenamiento</label>
+                            <input type="text" name="tipo_almacenamiento" class="form-control" placeholder="SSD/HDD">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Capacidad almacenamiento (GB)</label>
+                            <input type="text" name="capacidad_almacenamiento_gb" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Sistema operativo/versión</label>
+                            <input type="text" name="sistema_operativo_version" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Activo Fijo UAM</label>
+                            <input type="text" name="activo_fijo_uam" class="form-control">
+                        </div>
+                        
+                        <div class="col-md-12 mt-3">
+                            <h5>Ubicación</h5>
+                            <hr>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Ubicación</label>
+                            <input type="text" name="ubicacion" class="form-control">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Bloque</label>
+                            <input type="text" name="bloque" class="form-control">
+                        </div>
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">Piso</label>
+                            <input type="text" name="piso" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Espacio</label>
+                            <input type="text" name="espacio" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Puesto/Numeración</label>
+                            <input type="text" name="puesto_numeracion" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Modalidad laboral</label>
+                            <select name="modalidad_laboral" class="form-control">
+                                <option value="">Seleccione...</option>
+                                <option>Presencial</option>
+                                <option>Teletrabajo</option>
+                                <option>Híbrido</option>
+                            </select>
+                        </div>
+                        
+                        <div class="col-md-12 mt-3">
+                            <h5>Dirección</h5>
+                            <hr>
+                        </div>
+                        
+                        <div class="col-md-2 mb-3">
+                            <label class="form-label">País</label>
+                            <input type="text" name="pais" class="form-control" value="Colombia">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Departamento</label>
+                            <input type="text" name="departamento" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Municipio</label>
+                            <input type="text" name="municipio" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Barrio</label>
+                            <input type="text" name="barrio" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Dirección Sede</label>
+                            <input type="text" name="direccion_sede" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Dirección Teletrabajo</label>
+                            <input type="text" name="direccion_teletrabajo" class="form-control">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Observaciones Teletrabajo</label>
+                            <textarea name="observaciones_teletrabajo" class="form-control" rows="2"></textarea>
+                        </div>
+                        
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Estado</label>
+                            <select name="estado" class="form-control">
+                                <option>Activo</option>
+                                <option>Mantenimiento</option>
+                                <option>Baja</option>
+                                <option>Reparación</option>
+                            </select>
+                        </div>
+                        <div class="col-md-5 mb-3">
+                            <label class="form-label">Responsable / usuario asignado</label>
+                            <input type="text" name="responsable_usuario" class="form-control">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Fecha de adquisición</label>
+                            <input type="date" name="fecha_adquisicion" class="form-control">
+                        </div>
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Comentarios</label>
+                            <textarea name="comentarios" class="form-control" rows="3"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save"></i> Guardar Activo
+                        </button>
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-times"></i> Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
