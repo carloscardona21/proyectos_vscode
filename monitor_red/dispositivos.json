@@ -1,0 +1,58 @@
+[
+  {
+    "id": 1,
+    "nombre": "Router Principal",
+    "ip": "192.168.1.1",
+    "tipo": "router",
+    "activo": true
+  },
+  {
+    "id": 2,
+    "nombre": "Servidor Web",
+    "ip": "192.168.1.10",
+    "tipo": "servidor",
+    "activo": true
+  },
+  {
+    "id": 3,
+    "nombre": "Google DNS",
+    "ip": "8.8.8.8",
+    "tipo": "externo",
+    "activo": true
+  },
+  {
+    "id": 4,
+    "nombre": "Cloudflare DNS",
+    "ip": "1.1.1.1",
+    "tipo": "externo",
+    "activo": true
+  },
+  {
+    "id": 6,
+    "nombre": "Monauto",
+    "ip": "10.4.24.3",
+    "tipo": "otro",
+    "activo": true
+  },
+  {
+    "id": 7,
+    "nombre": "Piso 5 Hoodle 501",
+    "ip": "10.1.40.38",
+    "tipo": "pc",
+    "activo": true
+  },
+  {
+    "id": 8,
+    "nombre": "Sala Reuniones 502 Piso 5",
+    "ip": "10.1.40.39",
+    "tipo": "pc",
+    "activo": true
+  },
+  {
+    "id": 9,
+    "nombre": "telefono mesa servicio",
+    "ip": "10.1.24.79",
+    "tipo": "otro",
+    "activo": true
+  }
+]

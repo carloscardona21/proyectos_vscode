@@ -1,0 +1,4 @@
+ip,hostname,mac,tipo,sistema,estado,ubicacion,ultimo_escaneo
+10.1.7.10,Desconocido,22:BE:FD:5B:40:F2,Estación de trabajo,Linux/Unix,Activo,Red Corporativa,2026-04-10 07:19:57
+10.1.7.254,Desconocido,CC:03:D9:CC:85:F3,Estación de trabajo,Linux/Unix,Activo,Red Corporativa,2026-04-10 07:20:03
+10.1.7.3,LAP1670004183.uam.edu.co,No disponible,Estación de trabajo,Windows,Activo,Red Corporativa,2026-04-10 07:20:04

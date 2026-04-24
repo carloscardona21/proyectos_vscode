@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Equipos de Red</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .config-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .config-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        
+        .vpn-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: translateY(-2px);
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-card {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .table-container {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            position: sticky;
+            top: 0;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .status-active {
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 50px;
+            display: none;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📡 Inventario de Equipos de Red</h1>
+            <p>Escanea y gestiona todos los dispositivos en tu red corporativa y VPN</p>
+        </div>
+        
+        <div class="content">
+            <div id="alert" class="alert"></div>
+            
+            <div class="config-section">
+                <h3>⚙️ Configuración de Escaneo</h3>
+                <div class="config-group">
+                    <label>🌐 Red Local (CIDR):</label>
+                    <input type="text" id="redLocal" placeholder="Ej: 192.168.1.0/24" value="192.168.1.0/24">
+                </div>
+                
+                <div class="config-group">
+                    <label>🔗 Redes VPN:</label>
+                    <div id="vpnRedes">
+                        <div class="vpn-input">
+                            <input type="text" placeholder="Ej: 10.0.0.0/24" class="vpn-input-field">
+                            <button type="button" onclick="agregarVPN()">+</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <button onclick="iniciarEscaneo()" id="btnEscanear">🚀 Iniciar Escaneo</button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p style="margin-top: 20px;">Escaneando red, por favor espere...</p>
+            </div>
+            
+            <div id="resultados" style="display: none;">
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalEquipos">0</div>
+                        <div class="stat-label">Total de Equipos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalLocal">0</div>
+                        <div class="stat-label">Red Local</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalVPN">0</div>
+                        <div class="stat-label">VPN</div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 20px;">
+                    <button onclick="exportarCSV()" class="btn-success">📥 Exportar a CSV</button>
+                    <button onclick="limpiarTabla()" class="btn-danger">🗑️ Limpiar Resultados</button>
+                </div>
+                
+                <div class="table-container">
+                    <table id="tablaEquipos">
+                        <thead>
+                            <tr>
+                                <th>IP</th>
+                                <th>Hostname</th>
+                                <th>MAC</th>
+                                <th>Tipo</th>
+                                <th>Sistema</th>
+                                <th>Estado</th>
+                                <th>Ubicación</th>
+                                <th>Último Escaneo</th>
+                            </tr>
+                        </thead>
+                        <tbody id="cuerpoTabla">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let equiposActuales = [];
+        
+        function agregarVPN() {
+            const container = document.getElementById('vpnRedes');
+            const div = document.createElement('div');
+            div.className = 'vpn-input';
+            div.innerHTML = `
+                <input type="text" placeholder="Ej: 10.0.0.0/24" class="vpn-input-field">
+                <button type="button" onclick="eliminarVPN(this)">-</button>
+            `;
+            container.appendChild(div);
+        }
+        
+        function eliminarVPN(btn) {
+            btn.parentElement.remove();
+        }
+        
+        function mostrarAlerta(mensaje, tipo) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert alert-${tipo}`;
+            alert.textContent = mensaje;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+        
+        async function iniciarEscaneo() {
+            const redLocal = document.getElementById('redLocal').value;
+            const vpnInputs = document.querySelectorAll('.vpn-input-field');
+            const redesVPN = Array.from(vpnInputs).map(input => input.value).filter(v => v);
+            
+            if (!redLocal && redesVPN.length === 0) {
+                mostrarAlerta('Por favor ingrese al menos una red para escanear', 'error');
+                return;
+            }
+            
+            document.getElementById('btnEscanear').disabled = true;
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('resultados').style.display = 'none';
+            
+            try {
+                const response = await fetch('/escanear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        red_local: redLocal,
+                        redes_vpn: redesVPN
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    equiposActuales = data.equipos;
+                    mostrarResultados(data.equipos);
+                    mostrarAlerta(`Escaneo completado. Se encontraron ${data.total} equipos.`, 'success');
+                } else {
+                    mostrarAlerta('Error en el escaneo: ' + data.error, 'error');
+                }
+            } catch (error) {
+                mostrarAlerta('Error al conectar con el servidor: ' + error, 'error');
+            } finally {
+                document.getElementById('btnEscanear').disabled = false;
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+        
+        function mostrarResultados(equipos) {
+            const totalLocal = equipos.filter(e => e.ubicacion === 'Red Corporativa').length;
+            const totalVPN = equipos.filter(e => e.ubicacion.includes('VPN')).length;
+            
+            document.getElementById('totalEquipos').textContent = equipos.length;
+            document.getElementById('totalLocal').textContent = totalLocal;
+            document.getElementById('totalVPN').textContent = totalVPN;
+            
+            const tbody = document.getElementById('cuerpoTabla');
+            tbody.innerHTML = '';
+            
+            equipos.forEach(equipo => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${equipo.ip}</td>
+                    <td>${equipo.hostname}</td>
+                    <td>${equipo.mac}</td>
+                    <td>${equipo.tipo}</td>
+                    <td>${equipo.sistema || 'Desconocido'}</td>
+                    <td class="status-active">${equipo.estado}</td>
+                    <td>${equipo.ubicacion}</td>
+                    <td>${equipo.ultimo_escaneo}</td>
+                `;
+            });
+            
+            document.getElementById('resultados').style.display = 'block';
+        }
+        
+        async function exportarCSV() {
+            if (equiposActuales.length === 0) {
+                mostrarAlerta('No hay datos para exportar', 'error');
+                return;
+            }
+            
+            try {
+                window.location.href = '/exportar';
+                mostrarAlerta('Exportando archivo CSV...', 'success');
+            } catch (error) {
+                mostrarAlerta('Error al exportar: ' + error, 'error');
+            }
+        }
+        
+        function limpiarTabla() {
+            equiposActuales = [];
+            document.getElementById('cuerpoTabla').innerHTML = '';
+            document.getElementById('resultados').style.display = 'none';
+            mostrarAlerta('Resultados limpiados', 'success');
+        }
+    </script>
+</body>
+</html>

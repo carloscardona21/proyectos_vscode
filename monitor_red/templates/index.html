@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Red - Estado de Dispositivos</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🌐 Monitor de Red</h1>
+            <p>Estado en tiempo real de servidores y dispositivos de red</p>
+        </header>
+
+        <div class="controls">
+            <button id="btnAgregar" class="btn btn-primary">+ Agregar Dispositivo</button>
+            <button id="btnRefrescar" class="btn btn-secondary">🔄 Refrescar</button>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3>Total Dispositivos</h3>
+                <p id="totalDispositivos">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Activos</h3>
+                <p id="activosCount">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Inactivos</h3>
+                <p id="inactivosCount">0</p>
+            </div>
+        </div>
+
+        <div class="filtros">
+            <input type="text" id="filtroNombre" placeholder="Filtrar por nombre..." class="filtro-input">
+            <select id="filtroEstado" class="filtro-select">
+                <option value="todos">Todos los estados</option>
+                <option value="activo">Activos</option>
+                <option value="inactivo">Inactivos</option>
+                <option value="error">Error</option>
+                <option value="verificando">Verificando</option>
+            </select>
+        </div>
+
+        <div class="table-container">
+            <table id="tablaDispositivos">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>IP</th>
+                        <th>Tipo</th>
+                        <th>Estado</th>
+                        <th>Latencia</th>
+                        <th>Última Verificación</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaBody">
+                    <tr>
+                        <td colspan="7" class="loading">Cargando dispositivos...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Modal para agregar dispositivo -->
+    <div id="modalAgregar" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Agregar Dispositivo</h2>
+            <form id="formAgregar">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="ip">Dirección IP:</label>
+                    <input type="text" id="ip" name="ip" placeholder="Ej: 192.168.1.100" required>
+                </div>
+                <div class="form-group">
+                    <label for="tipo">Tipo:</label>
+                    <select id="tipo" name="tipo">
+                        <option value="servidor">Servidor</option>
+                        <option value="router">Router</option>
+                        <option value="impresora">Impresora</option>
+                        <option value="pc">PC</option>
+                        <option value="externo">Externo</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Agregar</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let intervaloActualizacion;
+
+        function obtenerEstadoIcono(estado) {
+            switch(estado) {
+                case 'activo': return '🟢';
+                case 'inactivo': return '🔴';
+                case 'error': return '⚠️';
+                default: return '🟡';
+            }
+        }
+
+        function obtenerEstadoTexto(estado) {
+            switch(estado) {
+                case 'activo': return 'Activo';
+                case 'inactivo': return 'Inactivo';
+                case 'error': return 'Error';
+                default: return 'Verificando...';
+            }
+        }
+
+        function formatearLatencia(latencia) {
+            if (latencia === null || latencia === undefined) return '-';
+            return `${latencia} ms`;
+        }
+
+        function formatearFecha(fechaISO) {
+            if (!fechaISO) return '-';
+            const fecha = new Date(fechaISO);
+            return fecha.toLocaleTimeString();
+        }
+
+        async function cargarDispositivos() {
+            try {
+                const response = await fetch('/api/dispositivos');
+                const dispositivos = await response.json();
+                
+                const filtroNombre = document.getElementById('filtroNombre').value.toLowerCase();
+                const filtroEstado = document.getElementById('filtroEstado').value;
+                
+                let dispositivosFiltrados = dispositivos;
+                
+                if (filtroNombre) {
+                    dispositivosFiltrados = dispositivosFiltrados.filter(d => 
+                        d.nombre.toLowerCase().includes(filtroNombre)
+                    );
+                }
+                
+                if (filtroEstado !== 'todos') {
+                    dispositivosFiltrados = dispositivosFiltrados.filter(d => 
+                        d.estado_actual.estado === filtroEstado
+                    );
+                }
+                
+                const tbody = document.getElementById('tablaBody');
+                
+                if (dispositivosFiltrados.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" class="loading">No hay dispositivos para mostrar</td></tr>';
+                } else {
+                    tbody.innerHTML = dispositivosFiltrados.map(d => `
+                        <tr class="estado-${d.estado_actual.estado}">
+                            <td><strong>${d.nombre}</strong></td>
+                            <td>${d.ip}</td>
+                            <td><span class="tipo-badge tipo-${d.tipo}">${d.tipo}</span></td>
+                            <td>
+                                <span class="estado-badge estado-${d.estado_actual.estado}">
+                                    ${obtenerEstadoIcono(d.estado_actual.estado)} ${obtenerEstadoTexto(d.estado_actual.estado)}
+                                </span>
+                            </td>
+                            <td>${formatearLatencia(d.estado_actual.latencia)}</td>
+                            <td>${formatearFecha(d.estado_actual.timestamp)}</td>
+                            <td>
+                                <button class="btn-accion btn-historial" onclick="verHistorial(${d.id}, '${d.nombre}')">📊 Historial</button>
+                                <button class="btn-accion btn-eliminar" onclick="eliminarDispositivo(${d.id})">🗑️ Eliminar</button>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+                
+                // Actualizar estadísticas
+                const total = dispositivos.length;
+                const activos = dispositivos.filter(d => d.estado_actual.estado === 'activo').length;
+                const inactivos = dispositivos.filter(d => d.estado_actual.estado === 'inactivo').length;
+                
+                document.getElementById('totalDispositivos').textContent = total;
+                document.getElementById('activosCount').textContent = activos;
+                document.getElementById('inactivosCount').textContent = inactivos;
+                
+            } catch (error) {
+                console.error('Error cargando dispositivos:', error);
+            }
+        }
+
+        async function eliminarDispositivo(id) {
+            if (confirm('¿Estás seguro de eliminar este dispositivo?')) {
+                try {
+                    const response = await fetch(`/api/dispositivos/${id}`, {
+                        method: 'DELETE'
+                    });
+                    if (response.ok) {
+                        cargarDispositivos();
+                    }
+                } catch (error) {
+                    console.error('Error eliminando dispositivo:', error);
+                }
+            }
+        }
+
+        async function verHistorial(id, nombre) {
+            try {
+                const response = await fetch(`/api/historial/${id}`);
+                const historial = await response.json();
+                
+                if (historial.length === 0) {
+                    alert(`No hay historial disponible para ${nombre}`);
+                    return;
+                }
+                
+                let mensaje = `Historial de ${nombre}:\n\n`;
+                historial.forEach(estado => {
+                    mensaje += `${formatearFecha(estado.timestamp)} - ${obtenerEstadoTexto(estado.estado)}`;
+                    if (estado.latencia) {
+                        mensaje += ` (${estado.latencia}ms)`;
+                    }
+                    mensaje += '\n';
+                });
+                
+                alert(mensaje);
+            } catch (error) {
+                console.error('Error cargando historial:', error);
+            }
+        }
+
+        // Modal para agregar dispositivo
+        const modal = document.getElementById('modalAgregar');
+        const btnAgregar = document.getElementById('btnAgregar');
+        const spanClose = document.getElementsByClassName('close')[0];
+
+        btnAgregar.onclick = function() {
+            modal.style.display = 'block';
+        }
+
+        spanClose.onclick = function() {
+            modal.style.display = 'none';
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+
+        document.getElementById('formAgregar').onsubmit = async function(e) {
+            e.preventDefault();
+            
+            const nombre = document.getElementById('nombre').value;
+            const ip = document.getElementById('ip').value;
+            const tipo = document.getElementById('tipo').value;
+            
+            try {
+                const response = await fetch('/api/dispositivos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ nombre, ip, tipo })
+                });
+                
+                if (response.ok) {
+                    modal.style.display = 'none';
+                    document.getElementById('formAgregar').reset();
+                    cargarDispositivos();
+                } else {
+                    const error = await response.json();
+                    alert('Error: ' + error.error);
+                }
+            } catch (error) {
+                console.error('Error agregando dispositivo:', error);
+                alert('Error al agregar dispositivo');
+            }
+        }
+
+        document.getElementById('btnRefrescar').onclick = () => cargarDispositivos();
+        document.getElementById('filtroNombre').oninput = () => cargarDispositivos();
+        document.getElementById('filtroEstado').onchange = () => cargarDispositivos();
+
+        // Iniciar actualización automática cada 10 segundos
+        cargarDispositivos();
+        intervaloActualizacion = setInterval(cargarDispositivos, 10000);
+    </script>
+</body>
+</html>

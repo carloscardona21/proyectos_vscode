@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Préstamos - Sistema de Préstamos TIC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Gestión de Préstamos</h1>
+            <p>Historial y seguimiento de préstamos de equipos tecnológicos</p>
+        </div>
+        
+        <div class="nav-bar">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}">Equipos</a></li>
+                <li><a href="{{ url_for('agregar_equipo') }}">Agregar Equipo</a></li>
+                <li><a href="{{ url_for('ver_prestamos') }}" class="active">Préstamos</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Historial de Préstamos</h2>
+            
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Préstamos</h3>
+                    <div class="number">{{ prestamos|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Préstamos Activos</h3>
+                    <div class="number">{{ prestamos|selectattr('estado', 'equalto', 'Activo')|list|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Devueltos</h3>
+                    <div class="number">{{ prestamos|selectattr('estado', 'equalto', 'Devuelto')|list|length }}</div>
+                </div>
+            </div>
+            
+            <!-- Botones de exportación -->
+            <div class="export-section">
+                <div class="dropdown">
+                    <button class="btn btn-primary" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                        📊 Exportar Equipos ▼
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('exportar_csv_equipos') }}">📄 Exportar a CSV</a>
+                        <a href="{{ url_for('exportar_excel_equipos') }}">📊 Exportar a Excel</a>
+                    </div>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-primary" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                        📋 Exportar Préstamos ▼
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('exportar_csv_prestamos') }}">📄 Exportar a CSV</a>
+                        <a href="{{ url_for('exportar_excel_prestamos') }}">📊 Exportar a Excel</a>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('exportar_excel_completo') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #e67e22, #d35400);">
+                    📈 Informe Completo
+                </a>
+            </div>
+            
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Equipo</th>
+                            <th>Usuario</th>
+                            <th>Departamento</th>
+                            <th>Fecha Préstamo</th>
+                            <th>Fecha Devolución</th>
+                            <th>Estado</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for prestamo in prestamos %}
+                        <tr class="fade-in">
+                            <td>#{{ prestamo.id }}</td>
+                            <td><strong>{{ prestamo.equipo_nombre }}</strong></td>
+                            <td>{{ prestamo.usuario }}</td>
+                            <td>{{ prestamo.departamento }}</td>
+                            <td>{{ prestamo.fecha_prestamo }}</td>
+                            <td>
+                                {% if prestamo.fecha_devolucion %}
+                                    {{ prestamo.fecha_devolucion }}
+                                {% else %}
+                                    <span class="badge badge-warning">Pendiente</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if prestamo.estado == 'Activo' %}
+                                    <span class="badge badge-warning" style="background-color: #f39c12;">Activo</span>
+                                {% else %}
+                                    <span class="badge badge-success" style="background-color: #27ae60;">Devuelto</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if prestamo.estado == 'Activo' %}
+                                <form action="{{ url_for('devolver_equipo', prestamo_id=prestamo.id) }}" 
+                                    method="POST" style="display: inline;">
+                                    <button type="submit" class="btn btn-success btn-sm" 
+                                            onclick="return confirm('¿Está seguro de registrar la devolución de {{ prestamo.equipo_nombre }}?')">
+                                            Registrar Devolución
+                                    </button>
+                                </form>
+                                {% else %}
+                                    <span style="color: #95a5a6;">Completado</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {% if not prestamos %}
+            <div style="text-align: center; padding: 50px; color: #999;">
+                <p>📭 No hay préstamos registrados</p>
+                <p style="margin-top: 10px; font-size: 0.9em;">Los préstamos aparecerán aquí cuando se soliciten equipos</p>
+                <a href="{{ url_for('index') }}" class="btn btn-primary" style="margin-top: 20px;">📱 Ver Equipos</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 Sistema de Préstamos TIC - Todos los derechos reservados</p>
+        </div>
+    </div>
+</body>
+</html>

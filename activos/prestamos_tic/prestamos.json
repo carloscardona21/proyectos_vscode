@@ -1,0 +1,42 @@
+[
+    {
+        "id": 1,
+        "equipo_id": 1,
+        "equipo_nombre": "Laptop Dell XPS 15",
+        "usuario": "carlos.cardonap",
+        "departamento": "Tic",
+        "fecha_prestamo": "2026-03-20 09:04:04",
+        "fecha_devolucion": "2026-03-20 09:04:20",
+        "estado": "Devuelto"
+    },
+    {
+        "id": 2,
+        "equipo_id": 1,
+        "equipo_nombre": "Laptop Dell XPS 15",
+        "usuario": "carlos.cardonap",
+        "departamento": "Tic",
+        "fecha_prestamo": "2026-03-20 09:04:52",
+        "fecha_devolucion": "2026-03-20 09:19:30",
+        "estado": "Devuelto"
+    },
+    {
+        "id": 3,
+        "equipo_id": 3,
+        "equipo_nombre": "Apuntador",
+        "usuario": "Mauricio Zapata",
+        "departamento": "MVZ",
+        "fecha_prestamo": "2026-03-20 11:13:25",
+        "fecha_devolucion": "2026-03-20 11:26:19",
+        "estado": "Devuelto"
+    },
+    {
+        "id": 4,
+        "equipo_id": 1,
+        "equipo_nombre": "Laptop Dell XPS 15",
+        "usuario": "Marimar Zapata",
+        "departamento": "Adontologia",
+        "fecha_prestamo": "2026-03-20 11:27:08",
+        "fecha_devolucion": null,
+        "estado": "Activo"
+    }
+]

@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Préstamos TIC</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📱 Sistema de Préstamos TIC</h1>
+            <p>Gestión de equipos tecnológicos - Área de Tecnología</p>
+        </div>
+        
+        <div class="nav-bar">
+            <ul class="nav-links">
+                <li><a href="{{ url_for('index') }}" class="active">Equipos</a></li>
+                <li><a href="{{ url_for('agregar_equipo') }}">Agregar Equipo</a></li>
+                <li><a href="{{ url_for('ver_prestamos') }}">Préstamos Activos</a></li>
+            </ul>
+        </div>
+        
+        <div class="main-content">
+            <h2 style="color: var(--primary-color); margin-bottom: 20px;">Equipos Disponibles</h2>
+            
+            <!-- Stats -->
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total Equipos</h3>
+                    <div class="number">{{ equipos|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Disponibles</h3>
+                    <div class="number">{{ equipos|selectattr('estado', 'equalto', 'Disponible')|list|length }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>En Préstamo</h3>
+                    <div class="number">{{ equipos|selectattr('estado', 'equalto', 'Prestado')|list|length }}</div>
+                </div>
+            </div>
+            
+            <!-- Botones de exportación -->
+            <div class="export-section">
+                <div class="dropdown">
+                    <button class="btn btn-primary" style="background: linear-gradient(135deg, #27ae60, #229954);">
+                        📊 Exportar Equipos ▼
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('exportar_csv_equipos') }}">📄 Exportar a CSV</a>
+                        <a href="{{ url_for('exportar_excel_equipos') }}">📊 Exportar a Excel</a>
+                    </div>
+                </div>
+                
+                <div class="dropdown">
+                    <button class="btn btn-primary" style="background: linear-gradient(135deg, #3498db, #2980b9);">
+                        📋 Exportar Préstamos ▼
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('exportar_csv_prestamos') }}">📄 Exportar a CSV</a>
+                        <a href="{{ url_for('exportar_excel_prestamos') }}">📊 Exportar a Excel</a>
+                    </div>
+                </div>
+                
+                <a href="{{ url_for('exportar_excel_completo') }}" class="btn btn-primary" style="background: linear-gradient(135deg, #e67e22, #d35400);">
+                    📈 Informe Completo
+                </a>
+            </div>
+            
+            <!-- Search Bar -->
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Buscar equipo por nombre, tipo, marca o serial..." id="searchInput">
+                <button class="btn btn-primary" onclick="searchEquipos()">🔍 Buscar</button>
+            </div>
+            
+            <!-- Equipos Grid -->
+            <div class="equipos-grid" id="equiposGrid">
+                {% for equipo in equipos %}
+                <div class="equipo-card fade-in" data-nombre="{{ equipo.nombre }}" data-tipo="{{ equipo.tipo }}" data-marca="{{ equipo.marca }}" data-serial="{{ equipo.serial }}">
+                    <div class="equipo-header">
+                        {{ equipo.nombre }}
+                    </div>
+                    <div class="equipo-body">
+                        <div class="equipo-info">
+                            <strong>Tipo:</strong> {{ equipo.tipo }}
+                        </div>
+                        <div class="equipo-info">
+                            <strong>Marca:</strong> {{ equipo.marca }}
+                        </div>
+                        <div class="equipo-info">
+                            <strong>Modelo:</strong> {{ equipo.modelo }}
+                        </div>
+                        <div class="equipo-info">
+                            <strong>Serial:</strong> {{ equipo.serial }}
+                        </div>
+                        <div>
+                            <span class="equipo-estado estado-{{ 'disponible' if equipo.estado == 'Disponible' else 'prestado' }}">
+                                {{ equipo.estado }}
+                            </span>
+                        </div>
+                        
+                        {% if equipo.estado == 'Disponible' %}
+                        <div class="equipo-actions">
+                            <button class="btn btn-success btn-sm" onclick="mostrarFormPrestamo({{ equipo.id }})">
+                                📝 Solicitar Préstamo
+                            </button>
+                        </div>
+                        
+                        <!-- Formulario de préstamo oculto -->
+                        <div id="prestamoForm{{ equipo.id }}" style="display: none; margin-top: 15px;">
+                            <form action="{{ url_for('prestar_equipo', equipo_id=equipo.id) }}" method="POST">
+                                <div class="form-group">
+                                    <input type="text" name="usuario" placeholder="Nombre del usuario" class="form-control" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" name="departamento" placeholder="Departamento" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-sm">✅ Confirmar Préstamo</button>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="cerrarFormPrestamo({{ equipo.id }})">❌ Cancelar</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            {% if not equipos %}
+            <div style="text-align: center; padding: 50px; color: #999;">
+                <p>📭 No hay equipos registrados. ¡Agrega tu primer equipo!</p>
+                <a href="{{ url_for('agregar_equipo') }}" class="btn btn-primary" style="margin-top: 20px;">➕ Agregar Equipo</a>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="footer">
+            <p>&copy; 2024 Sistema de Préstamos TIC - Todos los derechos reservados</p>
+        </div>
+    </div>
+    
+    <script>
+        // Función para mostrar el formulario de préstamo
+        function mostrarFormPrestamo(equipoId) {
+            var form = document.getElementById('prestamoForm' + equipoId);
+            if (form) {
+                form.style.display = 'block';
+            }
+        }
+        
+        // Función para cerrar el formulario de préstamo
+        function cerrarFormPrestamo(equipoId) {
+            var form = document.getElementById('prestamoForm' + equipoId);
+            if (form) {
+                form.style.display = 'none';
+            }
+        }
+        
+        // Función mejorada para buscar equipos
+        function searchEquipos() {
+            var searchText = document.getElementById('searchInput').value.toLowerCase().trim();
+            var cards = document.getElementsByClassName('equipo-card');
+            var foundCount = 0;
+            
+            // Recorrer todas las tarjetas de equipos
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                var text = card.textContent.toLowerCase();
+                
+                // Si el texto de la tarjeta contiene el texto de búsqueda
+                if (searchText === '' || text.indexOf(searchText) !== -1) {
+                    card.style.display = 'block';
+                    foundCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            }
+            
+            // Mostrar mensaje si no hay resultados
+            var equiposGrid = document.getElementById('equiposGrid');
+            var noResultsMsg = document.getElementById('noResultsMsg');
+            
+            if (foundCount === 0 && searchText !== '') {
+                if (!noResultsMsg) {
+                    var msg = document.createElement('div');
+                    msg.id = 'noResultsMsg';
+                    msg.style.textAlign = 'center';
+                    msg.style.padding = '50px';
+                    msg.style.color = '#999';
+                    msg.innerHTML = '<p>🔍 No se encontraron equipos que coincidan con "' + searchText + '"</p>';
+                    equiposGrid.parentNode.insertBefore(msg, equiposGrid.nextSibling);
+                } else {
+                    noResultsMsg.style.display = 'block';
+                    noResultsMsg.innerHTML = '<p>🔍 No se encontraron equipos que coincidan con "' + searchText + '"</p>';
+                }
+            } else if (noResultsMsg) {
+                noResultsMsg.style.display = 'none';
+            }
+        }
+        
+        // Función para buscar en tiempo real mientras se escribe
+        function setupRealTimeSearch() {
+            var searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function() {
+                    searchEquipos();
+                });
+            }
+        }
+        
+        // Inicializar cuando la página termine de cargar
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setupRealTimeSearch();
+            });
+        } else {
+            setupRealTimeSearch();
+        }
+    </script>
+</body>
+</html>

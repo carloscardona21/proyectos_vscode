@@ -1,0 +1,32 @@
+[
+    {
+        "id": 1,
+        "nombre": "Laptop Dell XPS 15",
+        "tipo": "Laptop",
+        "marca": "Dell",
+        "modelo": "XPS 15",
+        "serial": "DLL-XPS-2024-001",
+        "estado": "Prestado",
+        "fecha_registro": "2024-01-15 10:30:00"
+    },
+    {
+        "id": 2,
+        "nombre": "Proyector Epson",
+        "tipo": "Proyector",
+        "marca": "Epson",
+        "modelo": "PowerLite",
+        "serial": "EPS-PRO-2024-002",
+        "estado": "Disponible",
+        "fecha_registro": "2024-01-15 10:31:00"
+    },
+    {
+        "id": 3,
+        "nombre": "Apuntador",
+        "tipo": "Otro",
+        "marca": " Lipis",
+        "modelo": "JJuan",
+        "serial": "gvi544hk5",
+        "estado": "Disponible",
+        "fecha_registro": "2026-03-20 09:21:11"
+    }
+]
