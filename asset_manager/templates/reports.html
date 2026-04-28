@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reportes - Gestión de Activos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Reportes de Activos Tecnológicos</h1>
+            <nav>
+                <a href="/" class="nav-link">📱 Gestión de Activos</a>
+                <a href="/reports" class="nav-link active">📊 Reportes</a>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <div class="report-controls">
+                <h2>Filtros de Reporte</h2>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label for="filter-type">Tipo de Dispositivo</label>
+                        <select id="filter-type">
+                            <option value="">Todos</option>
+                            <option value="Computador">Computador</option>
+                            <option value="Laptop">Laptop</option>
+                            <option value="Tablet">Tablet</option>
+                            <option value="Smartphone">Smartphone</option>
+                            <option value="Monitor">Monitor</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filter-location">Ubicación</label>
+                        <select id="filter-location">
+                            <option value="">Todas</option>
+                            <option value="Teletrabajo">Teletrabajo</option>
+                            <option value="Oficina">Oficina</option>
+                            <option value="Bodega">Bodega</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="filter-status">Estado</label>
+                        <select id="filter-status">
+                            <option value="">Todos</option>
+                            <option value="Activo">Activo</option>
+                            <option value="En mantenimiento">En mantenimiento</option>
+                            <option value="Dado de baja">Dado de baja</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="report-actions">
+                    <button onclick="downloadReport()" class="btn-primary">📥 Descargar CSV</button>
+                    <button onclick="loadStats()" class="btn-secondary">📈 Actualizar Estadísticas</button>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-card">
+                    <h3>Total de Activos</h3>
+                    <div id="total-assets" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Activos Asignados</h3>
+                    <div id="assigned-assets" class="stat-value">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>En Mantenimiento</h3>
+                    <div id="maintenance-assets" class="stat-value">0</div>
+                </div>
+            </div>
+
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>Activos por Tipo</h3>
+                    <canvas id="type-chart"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>Activos por Ubicación</h3>
+                    <canvas id="location-chart"></canvas>
+                </div>
+            </div>
+
+            <div class="report-table">
+                <h2>Detalle de Activos</h2>
+                <div class="table-container">
+                    <table id="report-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
+                                <th>Ubicación</th>
+                                <th>Asignado a</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody id="report-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+    <script>
+        // Cargar estadísticas y gráficos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadReportTable();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Activos Tecnológicos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 Gestión de Activos Tecnológicos</h1>
+            <nav>
+                <a href="/" class="nav-link active">📱 Gestión de Activos</a>
+                <a href="/reports" class="nav-link">📊 Reportes</a>
+            </nav>
+        </header>
+
+        <div class="main-content">
+            <div class="scanner-section">
+                <h2>Escáner de Códigos</h2>
+                <div class="scanner-container">
+                    <div id="scanner-viewport"></div>
+                    <button id="start-scanner" onclick="startScanner()">📷 Iniciar Escáner</button>
+                    <button id="stop-scanner" onclick="stopScanner()" style="display: none;">⏹️ Detener Escáner</button>
+                </div>
+                
+                <div class="manual-entry">
+                    <h3>O ingrese el código manualmente</h3>
+                    <div class="input-group">
+                        <input type="text" id="manual-code" placeholder="Ingrese el código del activo">
+                        <button onclick="searchByCode()" class="btn-primary">🔍 Buscar</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section" id="asset-form" style="display: none;">
+                <h2 id="form-title">Registrar Activo</h2>
+                <form id="asset-form-data">
+                    <input type="hidden" id="asset-id">
+                    
+                    <div class="form-group">
+                        <label for="code">Código del Activo *</label>
+                        <input type="text" id="code" name="code" required readonly>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="device_type">Tipo de Dispositivo *</label>
+                            <select id="device_type" name="device_type" required onchange="toggleComputerFields()">
+                                <option value="">Seleccione tipo...</option>
+                                <option value="Computador">Computador</option>
+                                <option value="Laptop">Laptop</option>
+                                <option value="Tablet">Tablet</option>
+                                <option value="Smartphone">Smartphone</option>
+                                <option value="Monitor">Monitor</option>
+                                <option value="Impresora">Impresora</option>
+                                <option value="Scanner">Scanner</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="brand">Marca *</label>
+                            <input type="text" id="brand" name="brand" required>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="model">Modelo</label>
+                            <input type="text" id="model" name="model">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="serial_number">Número de Serial</label>
+                            <input type="text" id="serial_number" name="serial_number">
+                        </div>
+                    </div>
+
+                    <!-- Campos específicos para computadores -->
+                    <div id="computer-fields" style="display: none;">
+                        <h3>Especificaciones del Computador</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="processor">Procesador</label>
+                                <input type="text" id="processor" name="processor">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="memory">Memoria RAM</label>
+                                <input type="text" id="memory" name="memory" placeholder="Ej: 8GB DDR4">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="operating_system">Sistema Operativo</label>
+                            <select id="operating_system" name="operating_system">
+                                <option value="">Seleccione SO...</option>
+                                <option value="Windows 10">Windows 10</option>
+                                <option value="Windows 11">Windows 11</option>
+                                <option value="Linux">Linux</option>
+                                <option value="macOS">macOS</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="location">Ubicación *</label>
+                            <select id="location" name="location" required>
+                                <option value="">Seleccione ubicación...</option>
+                                <option value="Teletrabajo">Teletrabajo</option>
+                                <option value="Oficina">Oficina</option>
+                                <option value="Bodega">Bodega</option>
+                                <option value="Sala de reuniones">Sala de reuniones</option>
+                                <option value="Data Center">Data Center</option>
+                                <option value="Otro">Otro</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assigned_to">Asignado a *</label>
+                            <input type="text" id="assigned_to" name="assigned_to" required placeholder="Nombre del responsable">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="status">Estado</label>
+                            <select id="status" name="status">
+                                <option value="Activo">Activo</option>
+                                <option value="En mantenimiento">En mantenimiento</option>
+                                <option value="Dado de baja">Dado de baja</option>
+                                <option value="En reparación">En reparación</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notas adicionales</label>
+                        <textarea id="notes" name="notes" rows="3"></textarea>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-primary">💾 Guardar Activo</button>
+                        <button type="button" onclick="clearForm()" class="btn-secondary">🗑️ Limpiar</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="assets-list">
+                <h2>📋 Activos Registrados</h2>
+                <div class="table-container">
+                    <table id="assets-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Tipo</th>
+                                <th>Marca</th>
+                                <th>Ubicación</th>
+                                <th>Asignado a</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="assets-table-body">
+                            <!-- Datos cargados dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/scanner.js') }}"></script>
+</body>
+</html>
